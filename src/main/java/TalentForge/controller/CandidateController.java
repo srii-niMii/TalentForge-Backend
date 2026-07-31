@@ -1,6 +1,7 @@
 package TalentForge.controller;
 
 import TalentForge.dto.CandidateRequest;
+import TalentForge.dto.StageUpdateRequest;
 import TalentForge.entity.Candidate;
 import TalentForge.service.CandidateService;
 import jakarta.validation.Valid;
@@ -47,5 +48,13 @@ public class CandidateController {
         candidateService.deleteCandidate(id);
 
         return "Candidate deleted successfully";
+    }
+
+    @PatchMapping("/{id}/stage")
+    public Candidate updateStage(
+            @PathVariable Long id,
+            @RequestBody StageUpdateRequest request){
+
+        return candidateService.updateStage(id, request);
     }
 }

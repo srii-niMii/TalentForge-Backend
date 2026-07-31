@@ -2,6 +2,7 @@ package TalentForge.controller;
 
 
 import TalentForge.dto.RegisterRequest;
+import TalentForge.dto.UserResponse;
 import TalentForge.entity.User;
 import TalentForge.service.UserService;
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +23,16 @@ public class AuthController {
 
 
     @PostMapping("/register")
-    public User register(@RequestBody RegisterRequest request){
+    public UserResponse register(@RequestBody RegisterRequest request){
 
-        return userService.registerUser(request);
+        User user = userService.registerUser(request);
+        
+        return new UserResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail(),
+                user.getRole()
+        );
 
     }
 

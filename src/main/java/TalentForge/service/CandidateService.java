@@ -1,12 +1,15 @@
 package TalentForge.service;
 
 import TalentForge.dto.CandidateRequest;
+import TalentForge.dto.StageUpdateRequest;
 import TalentForge.entity.Candidate;
 import TalentForge.entity.Job;
+import TalentForge.entity.StageHistory;
 import TalentForge.enums.CandidateStage;
 import TalentForge.exception.ResourceNotFoundException;
 import TalentForge.repository.CandidateRepository;
 import TalentForge.repository.JobRepository;
+import TalentForge.repository.StageHistoryRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,11 +20,15 @@ public class CandidateService {
 
     private final CandidateRepository candidateRepository;
     private final JobRepository jobRepository;
+    private final StageHistoryRepository stageHistoryRepository;
 
     public CandidateService(CandidateRepository candidateRepository,
-                            JobRepository jobRepository) {
+                            JobRepository jobRepository,
+                            StageHistoryRepository stageHistoryRepository) {
+
         this.candidateRepository = candidateRepository;
         this.jobRepository = jobRepository;
+        this.stageHistoryRepository = stageHistoryRepository;
     }
 
     public Candidate createCandidate(CandidateRequest request) {
@@ -86,5 +93,24 @@ public class CandidateService {
         Candidate candidate = getCandidateById(id);
 
         candidateRepository.delete(candidate);
+    }
+
+    public Candidate updateStage(Long id, StageUpdateRequest request) {
+
+
+        Candidate candidate = getCandidateById(id);
+        CandidateStage oldStage = candidate.getCurrentStage();
+        candidate.setCurrentStage(request.getStage());
+        Candidate updatedCandidate = candidateRepository.save(candidate);
+
+        StageHistory history = new StageHistory();
+        history.setCandidate(candidate);
+        history.setFromStage(oldStage);
+        history.setToStage(request.getStage());
+        history.setChangedBy(request.getChangedBy());
+        history.setNote(request.getNote());
+        history.setChangedAt(LocalDateTime.now());
+        stageHistoryRepository.save(history);
+        return updatedCandidate;
     }
 }
