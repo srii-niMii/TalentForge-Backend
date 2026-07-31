@@ -1,11 +1,13 @@
 package TalentForge.controller;
 
 
+import TalentForge.dto.LoginResponse;
 import TalentForge.dto.RegisterRequest;
 import TalentForge.dto.UserResponse;
 import TalentForge.entity.User;
 import TalentForge.service.UserService;
 import org.springframework.web.bind.annotation.*;
+import TalentForge.dto.LoginRequest;
 
 
 @RestController
@@ -34,6 +36,13 @@ public class AuthController {
                 user.getRole()
         );
 
+    }
+
+    @PostMapping("/login")
+    public LoginResponse login(
+            @RequestBody LoginRequest request) {
+        String token = userService.loginUser(request);
+        return new LoginResponse(token);
     }
 
 }
