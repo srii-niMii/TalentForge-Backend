@@ -26,4 +26,32 @@ public class JobController {
     public List<Job> getAllJobs() {
         return jobService.getAllJobs();
     }
+
+    @GetMapping("/{id}")
+    public Job getJobById(@PathVariable Long id){
+
+        return jobService.getJobById(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteJob(@PathVariable Long id){
+
+        jobService.deleteJob(id);
+
+        return "Job deleted successfully";
+    }
+
+    @PutMapping("/{id}")
+    public Job updateJob(
+            @PathVariable Long id,
+            @RequestBody JobRequest request){
+
+        return jobService.updateJob(id, request);
+    }
+
+    @PatchMapping("/{id}/close")
+    public Job closeJob(@PathVariable Long id){
+
+        return jobService.closeJob(id);
+    }
 }
