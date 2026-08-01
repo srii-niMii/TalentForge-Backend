@@ -14,6 +14,4 @@ public class UserResponse {
     private UserRole role;
     private String token;
 
-    public UserResponse(Long id, String name, String email, UserRole role) {
-    }
 }

@@ -5,12 +5,16 @@ import TalentForge.dto.StageUpdateRequest;
 import TalentForge.entity.Candidate;
 import TalentForge.entity.Job;
 import TalentForge.entity.StageHistory;
+import TalentForge.entity.User;
 import TalentForge.enums.CandidateStage;
+import TalentForge.enums.UserRole;
 import TalentForge.exception.ResourceNotFoundException;
 import TalentForge.repository.CandidateRepository;
 import TalentForge.repository.JobRepository;
 import TalentForge.repository.StageHistoryRepository;
+import TalentForge.repository.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,26 +25,39 @@ public class CandidateService {
     private final CandidateRepository candidateRepository;
     private final JobRepository jobRepository;
     private final StageHistoryRepository stageHistoryRepository;
+    private final UserRepository userRepository;
+    private final FileStorageService fileStorageService;
 
-    public CandidateService(CandidateRepository candidateRepository,
-                            JobRepository jobRepository,
-                            StageHistoryRepository stageHistoryRepository) {
+
+    public CandidateService(
+            CandidateRepository candidateRepository,
+            JobRepository jobRepository,
+            StageHistoryRepository stageHistoryRepository,
+            UserRepository userRepository, FileStorageService fileStorageService
+    ) {
 
         this.candidateRepository = candidateRepository;
         this.jobRepository = jobRepository;
         this.stageHistoryRepository = stageHistoryRepository;
+        this.userRepository = userRepository;
+        this.fileStorageService = fileStorageService;
     }
 
     public Candidate createCandidate(CandidateRequest request) {
 
         if (candidateRepository.existsByEmail(request.getEmail())) {
-            throw new IllegalArgumentException("Candidate with this email already exists.");
+
+            throw new IllegalArgumentException(
+                    "Candidate with this email already exists."
+            );
         }
 
         Job job = jobRepository.findById(request.getJobId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Job not found with id " + request.getJobId()));
+                                "Job not found with id " + request.getJobId()
+                        ));
+
 
         Candidate candidate = new Candidate();
 
@@ -58,26 +75,63 @@ public class CandidateService {
         return candidateRepository.save(candidate);
     }
 
-    public List<Candidate> getAllCandidates() {
-        return candidateRepository.findAll();
+
+
+
+    public List<Candidate> getAllCandidates(String email) {
+
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "User not found"
+                        ));
+
+
+        if(user.getRole() == UserRole.ADMIN) {
+
+            return candidateRepository.findAll();
+
+        }
+
+
+        return candidateRepository.findByJobCreatedBy(user);
     }
 
+
+
+
+
     public Candidate getCandidateById(Long id) {
+
 
         return candidateRepository.findById(id)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Candidate not found with id " + id));
+                                "Candidate not found with id " + id
+                        ));
     }
 
-    public Candidate updateCandidate(Long id, CandidateRequest request) {
+
+
+
+
+    public Candidate updateCandidate(
+            Long id,
+            CandidateRequest request
+    ) {
+
 
         Candidate candidate = getCandidateById(id);
+
 
         Job job = jobRepository.findById(request.getJobId())
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Job not found with id " + request.getJobId()));
+                                "Job not found with id " + request.getJobId()
+                        ));
+
+
 
         candidate.setName(request.getName());
         candidate.setEmail(request.getEmail());
@@ -95,13 +149,30 @@ public class CandidateService {
         candidateRepository.delete(candidate);
     }
 
-    public Candidate updateStage(Long id, StageUpdateRequest request) {
+    public Candidate updateStage(
+            Long id,
+            StageUpdateRequest request
+    ) {
 
 
         Candidate candidate = getCandidateById(id);
-        CandidateStage oldStage = candidate.getCurrentStage();
-        candidate.setCurrentStage(request.getStage());
-        Candidate updatedCandidate = candidateRepository.save(candidate);
+
+
+        CandidateStage oldStage =
+                candidate.getCurrentStage();
+
+
+
+        candidate.setCurrentStage(
+                request.getStage()
+        );
+
+
+        Candidate updatedCandidate =
+                candidateRepository.save(candidate);
+
+
+
 
         StageHistory history = new StageHistory();
         history.setCandidate(candidate);
@@ -112,5 +183,20 @@ public class CandidateService {
         history.setChangedAt(LocalDateTime.now());
         stageHistoryRepository.save(history);
         return updatedCandidate;
+    }
+
+    public Candidate uploadResume(
+            Long id,
+            MultipartFile file
+    ){
+        Candidate candidate =
+                getCandidateById(id);
+
+        String filePath =
+                fileStorageService.saveFile(file);
+
+        candidate.setResumeUrl(filePath);
+
+        return candidateRepository.save(candidate);
     }
 }

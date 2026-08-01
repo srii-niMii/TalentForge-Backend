@@ -5,7 +5,9 @@ import TalentForge.dto.StageUpdateRequest;
 import TalentForge.entity.Candidate;
 import TalentForge.service.CandidateService;
 import jakarta.validation.Valid;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -25,8 +27,13 @@ public class CandidateController {
     }
 
     @GetMapping
-    public List<Candidate> getAllCandidates() {
-        return candidateService.getAllCandidates();
+    public List<Candidate> getAllCandidates(
+            Authentication authentication
+    ){
+
+        return candidateService.getAllCandidates(
+                authentication.getName()
+        );
     }
 
     @GetMapping("/{id}")
@@ -48,6 +55,18 @@ public class CandidateController {
         candidateService.deleteCandidate(id);
 
         return "Candidate deleted successfully";
+    }
+
+    @PostMapping("/{id}/resume")
+    public Candidate uploadResume(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file
+    ){
+
+        return candidateService.uploadResume(
+                id,
+                file
+        );
     }
 
     @PatchMapping("/{id}/stage")

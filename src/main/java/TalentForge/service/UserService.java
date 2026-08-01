@@ -2,6 +2,7 @@ package TalentForge.service;
 
 import TalentForge.dto.RegisterRequest;
 import TalentForge.entity.User;
+import TalentForge.enums.UserRole;
 import TalentForge.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,7 @@ public class UserService {
         );
 
 
-        user.setRole(request.getRole());
+        user.setRole(UserRole.RECRUITER);
 
 
         return userRepository.save(user);

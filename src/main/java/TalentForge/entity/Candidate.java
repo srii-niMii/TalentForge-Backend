@@ -26,6 +26,7 @@ public class Candidate {
 
     private String phone;
 
+    @Column
     private String resumeUrl;
 
     private String source;

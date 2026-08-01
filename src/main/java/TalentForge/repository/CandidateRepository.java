@@ -2,6 +2,7 @@ package TalentForge.repository;
 
 import TalentForge.entity.Candidate;
 import TalentForge.entity.Job;
+import TalentForge.entity.User;
 import TalentForge.enums.CandidateStage;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -16,6 +17,8 @@ public interface CandidateRepository extends JpaRepository<Candidate, Long> {
     List<Candidate> findByJobAndCurrentStage(Job job, CandidateStage stage);
 
     List<Candidate> findByNameContainingIgnoreCase(String name);
+
+    List<Candidate> findByJobCreatedBy(User user);
 
     boolean existsByEmail(String email);
 }
