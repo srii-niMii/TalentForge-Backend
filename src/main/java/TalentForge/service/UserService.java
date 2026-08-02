@@ -8,7 +8,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import TalentForge.dto.LoginRequest;
 import TalentForge.security.JwtService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Service
 public class UserService {
@@ -50,7 +49,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
-    public String loginUser(LoginRequest request) {
+    public User loginUser(LoginRequest request) {
 
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() ->
@@ -69,6 +68,13 @@ public class UserService {
         }
 
 
-        return jwtService.generateToken(user.getEmail());
+        return user;
+    }
+
+    public String generateToken(User user){
+
+        return jwtService.generateToken(
+                user.getEmail()
+        );
     }
 }
