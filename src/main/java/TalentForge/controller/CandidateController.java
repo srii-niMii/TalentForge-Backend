@@ -76,4 +76,17 @@ public class CandidateController {
 
         return candidateService.updateStage(id, request);
     }
+
+    @GetMapping("/jobs/{jobId}/applicants")
+    public List<Candidate> getApplicantsByJob(
+            @PathVariable Long jobId,
+            Authentication authentication
+    ){
+
+        return candidateService.getApplicantsByJob(
+                jobId,
+                authentication.getName()
+        );
+
+    }
 }

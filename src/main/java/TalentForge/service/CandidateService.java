@@ -199,4 +199,44 @@ public class CandidateService {
 
         return candidateRepository.save(candidate);
     }
+
+    public List<Candidate> getApplicantsByJob(
+            Long jobId,
+            String email
+    ) {
+
+
+        Job job = jobRepository.findById(jobId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Job not found with id " + jobId
+                        )
+                );
+
+
+
+        User recruiter = userRepository.findByEmail(email)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "User not found"
+                        )
+                );
+
+
+        if (!job.getCreatedBy()
+                .getId()
+                .equals(recruiter.getId())) {
+
+
+            throw new RuntimeException(
+                    "You cannot access applicants of this job"
+            );
+
+        }
+
+
+
+        return candidateRepository.findByJob(job);
+
+    }
 }

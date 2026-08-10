@@ -1,6 +1,7 @@
 package TalentForge.entity;
 
 import TalentForge.enums.JobStatus;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,6 +36,20 @@ public class Job {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created_by")
+    @JsonIgnoreProperties({
+            "password",
+            "hibernateLazyInitializer",
+            "handler"
+    })
     private User createdBy;
+
+    public void setCreatedBy(User createdBy) {
+        this.createdBy = createdBy;
+    }
+
+
+    public User getCreatedBy() {
+        return createdBy;
+    }
 
 }

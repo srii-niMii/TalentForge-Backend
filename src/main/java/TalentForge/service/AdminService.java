@@ -61,8 +61,7 @@ public class AdminService {
                 savedUser.getId(),
                 savedUser.getName(),
                 savedUser.getEmail(),
-                savedUser.getRole(),
-                savedUser.getPassword()
+                savedUser.getRole()
         );
     }
 }
