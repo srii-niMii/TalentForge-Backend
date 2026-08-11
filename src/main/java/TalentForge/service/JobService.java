@@ -131,4 +131,10 @@ public class JobService {
         }
         return jobRepository.findAll();
     }
+
+    public List<Job> getOpenJobs() {
+
+        return jobRepository.findByStatus(JobStatus.OPEN);
+
+    }
 }

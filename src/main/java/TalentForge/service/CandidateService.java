@@ -45,18 +45,22 @@ public class CandidateService {
 
     public Candidate createCandidate(CandidateRequest request) {
 
-        if (candidateRepository.existsByEmail(request.getEmail())) {
-
+        Job job = jobRepository.findById(
+                request.getJobId()
+        ).orElseThrow(() ->
+                new ResourceNotFoundException(
+                        "Job not found with id "
+                                + request.getJobId()
+                )
+        );
+        if (candidateRepository.existsByEmailAndJob(
+                request.getEmail(),
+                job
+        )) {
             throw new IllegalArgumentException(
-                    "Candidate with this email already exists."
+                    "You have already applied for this job."
             );
         }
-
-        Job job = jobRepository.findById(request.getJobId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Job not found with id " + request.getJobId()
-                        ));
 
 
         Candidate candidate = new Candidate();
@@ -74,9 +78,6 @@ public class CandidateService {
 
         return candidateRepository.save(candidate);
     }
-
-
-
 
     public List<Candidate> getAllCandidates(String email) {
 
@@ -99,7 +100,9 @@ public class CandidateService {
     }
 
 
-
+    public List<Candidate> getMyApplications(String email) {
+        return candidateRepository.findByEmail(email);
+    }
 
 
     public Candidate getCandidateById(Long id) {

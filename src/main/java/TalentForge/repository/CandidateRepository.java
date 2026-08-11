@@ -20,5 +20,7 @@ public interface CandidateRepository extends JpaRepository<Candidate, Long> {
 
     List<Candidate> findByJobCreatedBy(User user);
 
+    List<Candidate> findByEmail(String email);
+    boolean existsByEmailAndJob(String email, Job job);
     boolean existsByEmail(String email);
 }

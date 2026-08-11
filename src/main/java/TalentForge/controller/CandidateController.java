@@ -36,6 +36,17 @@ public class CandidateController {
         );
     }
 
+    @GetMapping("/my-applications")
+    public List<Candidate> getMyApplications(
+            Authentication authentication
+    ) {
+
+        return candidateService.getMyApplications(
+                authentication.getName()
+        );
+
+    }
+
     @GetMapping("/{id}")
     public Candidate getCandidateById(@PathVariable Long id) {
         return candidateService.getCandidateById(id);

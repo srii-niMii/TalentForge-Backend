@@ -83,12 +83,25 @@ public class SecurityConfig {
                         .hasRole("ADMIN")
 
 
+                        .requestMatchers("/api/jobs/open")
+                        .hasAnyRole(
+                                "ADMIN",
+                                "RECRUITER",
+                                "CANDIDATE"
+                        )
+
+
                         .requestMatchers("/api/jobs/**")
                         .hasAnyRole(
                                 "ADMIN",
                                 "RECRUITER"
                         )
 
+                        .requestMatchers(
+                                HttpMethod.POST,
+                                "/api/candidates"
+                        )
+                        .hasRole("CANDIDATE")
 
                         .requestMatchers("/api/candidates/**")
                         .hasAnyRole(

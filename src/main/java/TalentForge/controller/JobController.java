@@ -41,6 +41,13 @@ public class JobController {
         );
     }
 
+
+    @GetMapping("/open")
+    public List<Job> getOpenJobs()
+    {
+        return jobService.getOpenJobs();
+    }
+
     @GetMapping("/{id}")
     public Job getJobById(
             @PathVariable Long id
